@@ -5,3 +5,11 @@
 /Closure_Project/Parser/*.html
 /Closure_Project/rest_api/migrations/
 .DS_STORE
+/Closure_Project/staticfiles/
+/Closure_Project/Closure_Project/migrations/
+
+# This file should only be accessible via the secret manager
+/Closure_Project/.env
+/Closure_Project/.env.*
+!/Closure_Project/.env.example
+__pycache__/
