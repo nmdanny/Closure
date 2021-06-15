@@ -3,4 +3,9 @@
 /Closure_Project/Parser/tracks/
 /Closure_Project/Parser/*.json
 /Closure_Project/Parser/*.html
+/Closure_Project/staticfiles/
 /Closure_Project/Closure_Project/migrations/
+/Closure_Project/.env
+/Closure_Project/.env.*
+!/Closure_Project/.env.example
+__pycache__/
