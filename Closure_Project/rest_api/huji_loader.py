@@ -59,8 +59,10 @@ def import_course_groups(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
     print(f"Detected {len(cg_dicts)} course-groups")
 
     from django.db.models import Max
-    id = CourseGroup.objects.all().aggregate(Max('track_id')) + 1
+    max_res = CourseGroup.objects.all().aggregate(Max('track_id'))
+    id = (max_res["track_id__max"] or 0) + 1
 
+    track_ids = []
     track_number_to_track_id = {}
     for cg in cg_dicts:
         # use "track_id" within JSON files as "track_number" (semantic)
@@ -70,9 +72,15 @@ def import_course_groups(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
         id += 1
 
         track_number_to_track_id[cg["track_number"]] = cg["track_id"]
+        track_ids.append(cg["track_id"])
 
-    corresponding_tracks = Track.objects.in_bulk()
+    # obtain all tracks corresponding to the course-groups (in the same order)
+    tracks = Track.objects.in_bulk(track_ids, field_name="id")
+    assert len(tracks) == len(cg_dicts)
+    print(tracks)
 
+    for cg in cg_dicts:
+        # group_values = 
 
     print("Done")
     raise ValueError("ERR")
