@@ -51,10 +51,31 @@ def import_course_group(group_values: Dict) -> None:
 
 
 def import_course_groups(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
-    for f in tqdm(os.listdir(folder), desc=f"Loading parsed groups from {folder}"):
-        path = os.path.join(folder,f)
-        import_course_group(load_json(path))
+    # for f in tqdm(os.listdir(folder), desc=f"Loading parsed groups from {folder}"):
+    #     path = os.path.join(folder,f)
+    #     import_course_group(load_json(path))
 
+    cg_dicts = [load_json(os.path.join(folder, cg_file)) for cg_file in os.listdir(folder)[:50]]
+    print(f"Detected {len(cg_dicts)} course-groups")
+
+    from django.db.models import Max
+    id = CourseGroup.objects.all().aggregate(Max('track_id')) + 1
+
+    track_number_to_track_id = {}
+    for cg in cg_dicts:
+        # use "track_id" within JSON files as "track_number" (semantic)
+        cg["track_number"] = cg["track_id"]
+        # set "track_id" to be an incrementing number (pk, meaningless)
+        cg["track_id"] = id
+        id += 1
+
+        track_number_to_track_id[cg["track_number"]] = cg["track_id"]
+
+    corresponding_tracks = Track.objects.in_bulk()
+
+
+    print("Done")
+    raise ValueError("ERR")
 
 def import_courses(only_add_new: bool, courses_json_file: str = str(COURSE_DUMP_FILE_PATH)) -> None:
     print(f"loading parsed courses from {courses_json_file}")
