@@ -102,4 +102,6 @@ substitutions:
 
 images:
   - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"
+
+timeout: 1800s
 # [END cloudrun_django_cloudmigrate]
