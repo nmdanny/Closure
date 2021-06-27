@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     'collectfast',
     'django.contrib.staticfiles',
     'rest_api.apps.RestApiConfig',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
