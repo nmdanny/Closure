@@ -94,9 +94,9 @@ steps:
 
 
 substitutions:
-  _INSTANCE_NAME: closure-postgres
+  _INSTANCE_NAME: prod-db
   _REGION: europe-west1
-  _SERVICE_NAME: closure-service
+  _SERVICE_NAME: prod-api
   _SECRET_SETTINGS_NAME: django_settings
 
 images:
