@@ -30,7 +30,7 @@ def import_tracks(folder: str = str(TRACK_DUMP_FOLDER_PATH)) -> None:
     Track.objects.bulk_create(tracks)
 
 
-def import_course_group(group_values: Dict) -> None:
+def import_course_group_fast(group_values: Dict) -> None:
     track_id = group_values['track_id']
     track = Track.objects.get(track_number=track_id)
     del group_values['track_id']
@@ -50,7 +50,7 @@ def import_course_group(group_values: Dict) -> None:
     group.save()
 
 
-def import_course_groups(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
+def import_course_groups_fast(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
     # for f in tqdm(os.listdir(folder), desc=f"Loading parsed groups from {folder}"):
     #     path = os.path.join(folder,f)
     #     import_course_group(load_json(path))
@@ -81,9 +81,44 @@ def import_course_groups(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
 
     for cg in cg_dicts:
         # group_values = 
+        pass
 
     print("Done")
     raise ValueError("ERR")
+
+
+def import_course_group(group_values: Dict) -> None:
+    track_id = group_values['track_id']
+    track = Track.objects.get(track_number=track_id)
+    del group_values['track_id']
+
+    group_values['track'] = track
+
+    course_ids = group_values['course_ids']
+    del group_values['course_ids']
+
+    group, _ = CourseGroup.objects.update_or_create(
+        track=track,
+        year_in_studies=group_values['year_in_studies'],
+        index_in_track_year=group_values['index_in_track_year'],
+        defaults=group_values)
+
+    group.courses.set(Course.objects.filter(course_id__in=course_ids))
+    group.save()
+
+
+
+def import_course_groups(folder: str = str(GROUP_DUMP_FOLDER_PATH)):
+    print(f"Loading course group JSONs")
+    cg_dicts = [load_json(os.path.join(folder, cg_file)) for cg_file in os.listdir(folder)]
+    print(f"Loaded {len(cg_dicts)} jsons")
+
+    
+    with transaction.atomic():
+        for cg_dict in tqdm(cg_dicts, desc="importing coursegroups to SQL"):
+            import_course_group(cg_dict)
+    
+
 
 def import_courses(only_add_new: bool, courses_json_file: str = str(COURSE_DUMP_FILE_PATH)) -> None:
     print(f"loading parsed courses from {courses_json_file}")
